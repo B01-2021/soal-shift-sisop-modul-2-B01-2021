@@ -93,6 +93,26 @@ int main()
   else 
   {
     while ((wait(&status)) > 0);
+    if (fork() == 0) 
+    {
+      int i;
+      getAnimal();
+
+      FILE *fpw;
+      char str[100];
+      fpw = fopen("keterangan.txt", "w");
+
+      if (fpw== NULL)
+      {
+        puts("Issue in opening the Output file");
+      }
+      for(i = 0; i < it; i++)
+      {
+        char str[200];
+        sprintf(str, "nama : %s\numur : %.1f tahun\n\n", name[i+1], age[i+1]);
+        fputs(str, fpw);
+      }
+    }
   }
 }
 
