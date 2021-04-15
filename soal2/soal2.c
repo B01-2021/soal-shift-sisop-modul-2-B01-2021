@@ -83,7 +83,8 @@ int main()
         }
         else 
         {
-           while ((wait(&status)) > 0);  
+          //soal 2c 2d
+          while ((wait(&status)) > 0);  
 
           cid4 = fork();
 
