@@ -12,115 +12,88 @@ char name[60][20];
 float age[60];
 char filename[60][100];
 
-
 void getAnimal();
 
 int main() 
 {
-  // pid_t pid, sid;
+  int status;
   
-  // pid = fork();
-  
-  // if(pid < 0) 
-  //   exit(EXIT_FAILURE);
-  
-  // if(pid > 0) 
-  //   exit(EXIT_SUCCESS);
-  
-  // umask(0);
-  
-  // sid = setsid();
-  // if(sid < 0) 
-  //   exit(EXIT_FAILURE);
-  
-  // close(STDIN_FILENO);
-  // close(STDOUT_FILENO);
-  // close(STDERR_FILENO);
+  pid_t cid1, cid2, cid3,  cid4;
+  cid1 = fork();
 
-  // while (1) 
-  // {
-    int status;
-    
-    pid_t cid1, cid2, cid3,  cid4;
-    cid1 = fork();
+  if (cid1 < 0) 
+    exit(EXIT_FAILURE); 
 
-    if (cid1 < 0) 
+  if (cid1 == 0) 
+  { 
+    if (fork() == 0) 
+    {
+      // soal 2.a
+      char *argv[] = {"unzip", "-j", "/root/sisop2021/modul2/pets.zip", "*.jpg", "-d", "/root/modul2/petshop", NULL};
+      execv("/bin/unzip", argv);
+    }
+    else 
+    {
+      while ((wait(&status)) > 0); 
+      //soal 2.b
+      cid2 = fork();
+
+      if (cid2 < 0) 
       exit(EXIT_FAILURE); 
-
-    if (cid1 == 0) 
-    { 
-      if (fork() == 0) 
+      if (cid2 == 0) 
       {
-        // soal 2.a
-        char *argv[] = {"unzip", "-j", "/root/sisop2021/modul2/pets.zip", "*.jpg", "-d", "/root/modul2/petshop", NULL};
-        execv("/bin/unzip", argv);
+        getAnimal();
+        
+        int i;
+        for(i = 0; i < it; i++) 
+        {
+          char target[100];
+          sprintf(target, "/root/modul2/petshop/%s", type[i]);
+          // printf("%s %s\n", target, type[i]);
+          
+          if(fork() == 0)
+          {
+            char *argv[] = {"mkdir", "-p", target, NULL};
+            execv("/bin/mkdir", argv);
+          }
+        }
       }
       else 
       {
-        while ((wait(&status)) > 0); 
-        //soal 2.b
-        cid2 = fork();
+        //soal 2c 2d
+        while ((wait(&status)) > 0);  
 
-        if (cid2 < 0) 
+        cid4 = fork();
+
+        if (cid4 < 0) 
         exit(EXIT_FAILURE); 
-        if (cid2 == 0) 
+        if (cid4 == 0) 
         {
-          getAnimal();
-          
           int i;
-          for(i = 0; i < it; i++) 
+          getAnimal();
+          for(i = 0; i < it; i++)
           {
-            char target[100];
-            sprintf(target, "/root/modul2/petshop/%s", type[i]);
-            // printf("%s %s\n", target, type[i]);
-            
             if(fork() == 0)
             {
-              char *argv[] = {"mkdir", "-p", target, NULL};
-              execv("/bin/mkdir", argv);
-            }
-          }
-        }
-        else 
-        {
-          //soal 2c 2d
-          while ((wait(&status)) > 0);  
+              char dir_name[100];
+              char src[200];
 
-          cid4 = fork();
-
-          if (cid4 < 0) 
-          exit(EXIT_FAILURE); 
-          if (cid4 == 0) 
-          {
-            int i;
-            getAnimal();
-            for(i = 0; i < it; i++)
-            {
-              if(fork() == 0)
-              {
-                char dir_name[100];
-                char src[200];
-
-                chdir("/root/modul2/petshop");
-                sprintf(dir_name, "%s/%s.jpg", type[i], name[i+1]);
-                sprintf(src, "%s", filename[i]);
-                char s[100];
-                // printf("%s\n", getcwd(s, 100));
-                // puts(dir_name);
-                char *argv[] = {"cp", src, dir_name, NULL};
-                execv("/bin/cp", argv);
-              }
+              chdir("/root/modul2/petshop");
+              sprintf(dir_name, "%s/%s.jpg", type[i], name[i+1]);
+              sprintf(src, "%s", filename[i]);
+              char s[100];
+              char *argv[] = {"cp", src, dir_name, NULL};
+              execv("/bin/cp", argv);
             }
           }
         }
       }
-    } 
-    else 
-    {
-      while ((wait(&status)) > 0);
     }
-  // }
-  
+  } 
+  else 
+  {
+    while ((wait(&status)) > 0);
+  }
 }
 
 void getAnimal() 
@@ -174,10 +147,4 @@ void getAnimal()
   }
   else
     perror ("Couldn't open the directory");
-
-  // int j;
-  // for (j = 0; j < it; j++)
-  // {
-  //   printf("%s %s\n", filename[j], type[j]);
-  // }
 }
