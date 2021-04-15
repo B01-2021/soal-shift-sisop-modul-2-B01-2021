@@ -9,7 +9,7 @@
 int it = 0;
 char type[60][20];
 char name[60][20];
-int age[60];
+float age[60];
 char filename[60][100];
 
 
@@ -41,7 +41,7 @@ int main()
   // {
     int status;
     
-    pid_t cid1, cid2, cid3;
+    pid_t cid1, cid2, cid3,  cid4;
     cid1 = fork();
 
     if (cid1 < 0) 
@@ -52,49 +52,65 @@ int main()
       if (fork() == 0) 
       {
         // soal 2.a
-        // char *argv[] = {"unzip", "-j", "/root/sisop2021/modul2/pets.zip", "*.jpg", "-d", "/root/modul2/petshop", NULL};
-        // execv("/bin/unzip", argv);
+        char *argv[] = {"unzip", "-j", "/root/sisop2021/modul2/pets.zip", "*.jpg", "-d", "/root/modul2/petshop", NULL};
+        execv("/bin/unzip", argv);
       }
       else 
       {
+        while ((wait(&status)) > 0); 
         //soal 2.b
-        if (fork() == 0) 
+        cid2 = fork();
+
+        if (cid2 < 0) 
+        exit(EXIT_FAILURE); 
+        if (cid2 == 0) 
         {
           getAnimal();
-        
-          // while ((wait(&status)) > 0);
           
-          // int i;
-          // for(i = 0; i < it; i++) 
-          // {
-          //   char target[100];
-          //   sprintf(target, "/root/modul2/petshop/%s", type[i]);
-          //   // printf("%s %s\n", target, type[i]);
-            
-          //   if(fork() == 0)
-          //   {
-          //     char *argv[] = {"mkdir", "-p", target, NULL};
-          //     execv("/bin/mkdir", argv);
-          //   }
-          // }
-        }
-        else 
-        {
-          while ((wait(&status)) > 0);
-
           int i;
-          for(i = 0; i < it; i++)
+          for(i = 0; i < it; i++) 
           {
+            char target[100];
+            sprintf(target, "/root/modul2/petshop/%s", type[i]);
+            // printf("%s %s\n", target, type[i]);
+            
             if(fork() == 0)
             {
-              char dir_name[100];
-              sprintf(dir_name, "/root/modul2/petshop/%s", type[i]);
-
-              char *argv[] = {"mkdir", "-p", dir_name, NULL};
+              char *argv[] = {"mkdir", "-p", target, NULL};
               execv("/bin/mkdir", argv);
             }
           }
+        }
+        else 
+        {
+           while ((wait(&status)) > 0);  
 
+          cid4 = fork();
+
+          if (cid4 < 0) 
+          exit(EXIT_FAILURE); 
+          if (cid4 == 0) 
+          {
+            int i;
+            getAnimal();
+            for(i = 0; i < it; i++)
+            {
+              if(fork() == 0)
+              {
+                char dir_name[100];
+                char src[200];
+
+                chdir("/root/modul2/petshop");
+                sprintf(dir_name, "%s/%s.jpg", type[i], name[i+1]);
+                sprintf(src, "%s", filename[i]);
+                char s[100];
+                // printf("%s\n", getcwd(s, 100));
+                // puts(dir_name);
+                char *argv[] = {"cp", src, dir_name, NULL};
+                execv("/bin/cp", argv);
+              }
+            }
+          }
         }
       }
     } 
@@ -110,7 +126,6 @@ void getAnimal()
 {
   DIR *dp;
   struct dirent *ep;
-  int it = 0;
 
   dp = opendir ("/root/modul2/petshop");
   if (dp != NULL)
@@ -149,7 +164,7 @@ void getAnimal()
                 pch2[strlen(pch2) - 4] = 0;
                 // puts(pch2);
               }
-              age[it] = atoi(pch2);
+              age[it] = atof(pch2);
             }
           }
         }
