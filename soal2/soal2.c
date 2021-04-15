@@ -31,8 +31,8 @@ int main()
     if (fork() == 0) 
     {
       // soal 2.a
-      // char *argv[] = {"unzip", "-j", "/root/sisop2021/modul2/pets.zip", "*.jpg", "-d", "/root/modul2/petshop", NULL};
-      // execv("/bin/unzip", argv);
+      char *argv[] = {"unzip", "-j", "/root/sisop2021/modul2/pets.zip", "*.jpg", "-d", "/root/modul2/petshop", NULL};
+      execv("/bin/unzip", argv);
     }
     else 
     {
@@ -51,7 +51,6 @@ int main()
         {
           char target[100];
           sprintf(target, "/root/modul2/petshop/%s", type[i]);
-          // printf("%s %s\n", target, type[i]);
           
           if(fork() == 0)
           {
@@ -101,6 +100,7 @@ int main()
       exit(EXIT_FAILURE); 
     if (cid5 == 0) 
     {
+      //soal 2e
       int i, j;
       getAnimal();
       getUniqueAnimal();
@@ -112,7 +112,6 @@ int main()
 
         sprintf(dir_name, "/root/modul2/petshop/%s", utype[j]);
         chdir(dir_name);
-        // printf("%s %s \n", dir_name, utype[j]);
 
         FILE *fpw;
         char str[100];
@@ -136,9 +135,11 @@ int main()
               for(i = 0; i < it; i++)
               {
                 char str[200], curr[20];
-                sprintf(str, "nama : %s\numur : %.1f tahun\n\n", name[i+1], age[i+1]);
-                // printf("%s %s\n", name[i+1], ep->d_name);
-                // printf("%s\n", ep->d_name);
+                if (age[i+1]-int(age[i+1]) > 0.0)
+                  sprintf(str, "nama : %s\numur : %.1f tahun\n\n", name[i+1], age[i+1]);
+                else
+                  sprintf(str, "nama : %s\numur : %.0f tahun\n\n", name[i+1], age[i+1]);
+      
                 strcpy(curr, name[i+1]);
                 strcat(curr, ".jpg");
 
@@ -154,8 +155,6 @@ int main()
         }
         else
           perror ("Couldn't open the directory");
-
-        puts("----------");
       }
     }
     else
@@ -213,6 +212,7 @@ void getAnimal()
         }
       }
     }
+    closedir(dp);
   }
   else
     perror ("Couldn't open the directory");
@@ -238,4 +238,3 @@ void getUniqueAnimal()
   else
     perror ("Couldn't open the directory");
 }
-
