@@ -53,7 +53,7 @@ int main()
       if (cid2 == 0) 
       {
         //soal 2.a
-        char *argv[] = {"unzip", "-j", "pets.zip", "*.jpg", "-d", "/root/modul2/petshop", NULL};
+        char *argv[] = {"unzip", "-j", "/root/sisop2021/modul2/pets.zip", "*.jpg", "-d", "/root/modul2/petshop", NULL};
         execv("/bin/unzip", argv);
       }
       else 
