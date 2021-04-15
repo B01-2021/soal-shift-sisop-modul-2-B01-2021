@@ -6,19 +6,21 @@
 #include <string.h>
 #include <dirent.h>
 
-int it = 0;
+int it = 0, uit = 0;
 char type[60][20];
+char utype[10][20];
 char name[60][20];
 float age[60];
 char filename[60][100];
 
 void getAnimal();
+void getUniqueAnimal();
 
 int main() 
 {
   int status;
   
-  pid_t cid1, cid2, cid3,  cid4;
+  pid_t cid1, cid2, cid3,  cid4, cid5;
   cid1 = fork();
 
   if (cid1 < 0) 
@@ -29,8 +31,8 @@ int main()
     if (fork() == 0) 
     {
       // soal 2.a
-      char *argv[] = {"unzip", "-j", "/root/sisop2021/modul2/pets.zip", "*.jpg", "-d", "/root/modul2/petshop", NULL};
-      execv("/bin/unzip", argv);
+      // char *argv[] = {"unzip", "-j", "/root/sisop2021/modul2/pets.zip", "*.jpg", "-d", "/root/modul2/petshop", NULL};
+      // execv("/bin/unzip", argv);
     }
     else 
     {
@@ -93,25 +95,72 @@ int main()
   else 
   {
     while ((wait(&status)) > 0);
-    if (fork() == 0) 
+
+    cid5 = fork();
+    if (cid5 < 0) 
+      exit(EXIT_FAILURE); 
+    if (cid5 == 0) 
     {
-      int i;
+      int i, j;
       getAnimal();
+      getUniqueAnimal();
 
-      FILE *fpw;
-      char str[100];
-      fpw = fopen("keterangan.txt", "w");
+      for (j = 0; j < uit; j++)
+      {
+        char dir_name[100];
+        char src[200];
 
-      if (fpw== NULL)
-      {
-        puts("Issue in opening the Output file");
+        sprintf(dir_name, "/root/modul2/petshop/%s", utype[j]);
+        chdir(dir_name);
+        // printf("%s %s \n", dir_name, utype[j]);
+
+        FILE *fpw;
+        char str[100];
+        fpw = fopen("keterangan.txt", "w");
+
+        if (fpw== NULL)
+        {
+          puts("Issue in opening the Output file");
+        }
+
+        DIR *dp;
+        struct dirent *ep;
+
+        dp = opendir (".");
+        if (dp != NULL)
+        {
+          while (ep = readdir (dp)) 
+          { 
+            if(!(strstr(ep->d_name, ".txt")) && strstr(ep->d_name, ".jpg"))
+            {
+              for(i = 0; i < it; i++)
+              {
+                char str[200], curr[20];
+                sprintf(str, "nama : %s\numur : %.1f tahun\n\n", name[i+1], age[i+1]);
+                // printf("%s %s\n", name[i+1], ep->d_name);
+                // printf("%s\n", ep->d_name);
+                strcpy(curr, name[i+1]);
+                strcat(curr, ".jpg");
+
+                if(strcmp(curr, ep->d_name) == 0) 
+                {
+                  fputs(str, fpw);
+                  break;
+                }
+              }
+            }
+          }
+          closedir(dp);
+        }
+        else
+          perror ("Couldn't open the directory");
+
+        puts("----------");
       }
-      for(i = 0; i < it; i++)
-      {
-        char str[200];
-        sprintf(str, "nama : %s\numur : %.1f tahun\n\n", name[i+1], age[i+1]);
-        fputs(str, fpw);
-      }
+    }
+    else
+    {
+      while ((wait(&status)) > 0);
     }
   }
 }
@@ -162,9 +211,31 @@ void getAnimal()
             }
           }
         }
-      } 
+      }
     }
   }
   else
     perror ("Couldn't open the directory");
 }
+
+void getUniqueAnimal() 
+{
+  DIR *dp;
+  struct dirent *ep;
+
+  dp = opendir ("/root/modul2/petshop");
+  if (dp != NULL)
+  {
+    while (ep = readdir (dp)) 
+    { 
+      if(!(strstr(ep->d_name, "."))) 
+      {
+        strcpy(utype[uit], ep->d_name);
+        uit++;
+      }
+    }
+  }
+  else
+    perror ("Couldn't open the directory");
+}
+
