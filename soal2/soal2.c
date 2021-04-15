@@ -135,7 +135,7 @@ int main()
               for(i = 0; i < it; i++)
               {
                 char str[200], curr[20];
-                if (age[i+1]-int(age[i+1]) > 0.0)
+                if ((age[i+1]-(int)age[i+1]) > 0.0)
                   sprintf(str, "nama : %s\numur : %.1f tahun\n\n", name[i+1], age[i+1]);
                 else
                   sprintf(str, "nama : %s\numur : %.0f tahun\n\n", name[i+1], age[i+1]);
@@ -204,7 +204,6 @@ void getAnimal()
               if(strstr(pch2, "jpg")) 
               {
                 pch2[strlen(pch2) - 4] = 0;
-                // puts(pch2);
               }
               age[it] = atof(pch2);
             }
