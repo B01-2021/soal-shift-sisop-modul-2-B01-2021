@@ -54,6 +54,7 @@ void move_foto(char *basePath){
     while ((dp = readdir(dir)) != NULL)
     {
         char *sub;
+        int status;
 
         sub = strstr(dp->d_name, ".jpg");
         if (sub && strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, ".." ) != 0)
@@ -68,12 +69,12 @@ void move_foto(char *basePath){
             strcpy(path, basePath);
             strcat(path, "/");
             strcat(path, dp->d_name);
-            if(0==fork())
-                move_foto(path);
-            else{
-                char *argv[]={"mv", "-q", file, "Pyoto", NULL};
+            if(0==fork()){
+                char *argv[]={"mv", file, "Pyoto", NULL};
                 execv("/bin/mv", argv);
             }
+            while ((wait(&status)) > 0);
+            
         }
     }
 
@@ -92,6 +93,7 @@ void move_musik(char *basePath){
         if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, ".." ) != 0)
         {
             char file[20];
+            int status;
             // printf("%s\n", dp->d_name);
 
             strcpy(file, "MUSIK/");
@@ -102,11 +104,11 @@ void move_musik(char *basePath){
             strcat(path, "/");
             strcat(path, dp->d_name);
             if(0==fork())
-                move_musik(path);
-            else{
-                char *argv[]={"mv", "-q", file, "Musyik", NULL};
+            {
+                char *argv[]={"mv", file, "Musyik", NULL};
                 execv("/bin/mv", argv);
             }
+            while ((wait(&status)) > 0);
         }
     }
     closedir(dir);
@@ -124,21 +126,20 @@ void move_film(char *basePath){
         if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, ".." ) != 0)
         {
             char file[20];
-            // printf("%s\n", dp->d_name);
+            int status;
 
             strcpy(file, "FILM/");
             strcat(file, dp->d_name);
             
-            // Construct new path from our base path
             strcpy(path, basePath);
             strcat(path, "/");
             strcat(path, dp->d_name);
             if(0==fork())
-                move_film(path);
-            else{
+            {
                 char *argv[]={"mv", file, "Fylm", NULL };
                 execv("/bin/mv", argv);
             }
+            while ((wait(&status)) > 0);
         }
     }
     closedir(dir);
@@ -146,6 +147,7 @@ void move_film(char *basePath){
 
 void move()
 {   
+    
     int i, status[3];
     for(i=0; i<3; i++){
         if(0==fork()){
@@ -211,7 +213,7 @@ int main(void)
                             // sleep(10);
                         }
 
-                            printf("%s", asctime(ptr));
+                            // printf("%s", asctime(ptr));
                             
                                 child_id4 = fork();
                                 if(child_id4==0){
@@ -220,7 +222,7 @@ int main(void)
                                     child_id5 = fork();
                                     if(child_id5==0){
                                         sleep(15);
-                                        while ((wait(&status2)) > 0);
+                                        while ((wait(&status)) > 0);
                                         del();
                                     }
                                     else{
@@ -230,6 +232,9 @@ int main(void)
                                 else{
                                     move();
                                 }
+                            //}
+                           
+                       // }
                     }
                     else{
                         unzip();
