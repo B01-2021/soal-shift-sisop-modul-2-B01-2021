@@ -102,7 +102,7 @@ void move_musik(char *basePath){
             strcat(path, "/");
             strcat(path, dp->d_name);
             if(0==fork())
-                move_foto(path);
+                move_musik(path);
             else{
                 char *argv[]={"mv", "-q", file, "Musyik", NULL};
                 execv("/bin/mv", argv);
@@ -134,7 +134,7 @@ void move_film(char *basePath){
             strcat(path, "/");
             strcat(path, dp->d_name);
             if(0==fork())
-                move_foto(path);
+                move_film(path);
             else{
                 char *argv[]={"mv", file, "Fylm", NULL };
                 execv("/bin/mv", argv);
