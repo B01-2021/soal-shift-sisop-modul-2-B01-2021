@@ -12,13 +12,12 @@
 
 int running = 1;
 
-void errormsg()
+void usageinfo()
 {
     printf("Usage: ./soal3 [-z | -x]\n\n");
     printf("to determine program behavior on exit, use either:\n");
-    printf("\t-z\tto terminate all processes on exit, or\n");
-    printf("\t-x\tto terminate main program while letting operations in existing directories finish on exit\n");
-
+    printf("\t-z\t to terminate all processes on exit, or\n");
+    printf("\t-x\t to terminate main program while letting operations in existing directories finish on exit\n");
 }
 
 void sighandler(int sig)
@@ -50,7 +49,7 @@ int main(int argc, char const *argv[])
         }
         else
         {
-            errormsg();
+            usageinfo();
             return 0;
         }
         makescript(script);
@@ -58,21 +57,19 @@ int main(int argc, char const *argv[])
     }
     else
     {
-        errormsg();
+        usageinfo();
         return 0;
     }
 
     while (running)
     {
         char dname[100];
-        char fname[100];
         char path[100];
-        struct tm timenow;
         pid_t child_id;
 
-        time_t t = time(NULL);
-        timenow = *localtime(&t);
-        strftime(dname, sizeof(dname), "%Y-%m-%d_%T", &timenow);
+        time_t dt = time(NULL);
+        struct tm dir_time = *localtime(&dt);
+        strftime(dname, sizeof(dname), "%Y-%m-%d_%T", &dir_time);
 
         child_id = fork();
 
@@ -84,32 +81,33 @@ int main(int argc, char const *argv[])
         {
             if (fork() == 0)
             {
-                char* arg[] = {"mkdir", dname, NULL};
+                char* arg[] = {"mkdir", "-p", dname, NULL};
                 execv("/usr/bin/mkdir", arg);
             }
-
         }
         else
         {
-            sleep(1);
             int i;
             for (i = 0; i < 10; i++)
             {
                 if (fork() == 0)
                 {
+                    sleep(5);
                     continue;
                 }
 
-                t = time(NULL);
-                timenow = *localtime(&t);
-                strftime(fname, sizeof(fname),"%Y-%m-%d_%T", &timenow);
+                char fname[100];
+                time_t ft = time(NULL);
+                struct tm file_time = *localtime(&ft);
+                strftime(fname, sizeof(fname),"%Y-%m-%d_%T", &file_time);
 
                 strcpy(path, dname);
                 strcat(path, "/");
                 strcat(path, fname);
+                // strcat(path, ".jpg");
 
                 char url[100] = "https://picsum.photos/";
-                int size = ((long)mktime(&timenow) % 1000) + 50;
+                int size = ((long)mktime(&file_time) % 1000) + 50;
                 char sizestr[10];
                 sprintf(sizestr, "%d", size);
                 strcat(url, sizestr);
@@ -124,28 +122,24 @@ int main(int argc, char const *argv[])
                 if ((msg[i] >= 'a' && msg[i] <= 'z') ||
                     (msg[i] >= 'A' && msg[i] <= 'Z'))
                 {
-                    if ((msg[i] + 5 > 'z') || (msg[i] + 5 > 'Z'))
+                    msg[i] += 5;
+
+                    if ((msg[i] > 'z') || (msg[i] > 'Z' && msg[i] < 'a'))
                     {
                         msg[i] -= 26;
                     }
-
-                    msg[i] += 5;
                 }
             }
-
-            char path[100];
             strcpy(path, dname);
-            strcat(path, "/");
-            strcat(path, "status.txt");
+            strcat(path, "/status.txt");
             FILE* txt = fopen(path, "w");
             fputs(msg, txt);
             fclose(txt);
 
-            strcpy(path, dname);
-            strcat(path, ".zip");
-            char* arg[] = {"zip", "-mqr", path, dname};
-            execv("usr/bin/zip", arg);
+            char* arg[] = {"zip", "-m", "-q", "-r", dname, dname, NULL};
+            execv("/usr/bin/zip", arg);
         }
+
         sleep(40);
     }
 }
