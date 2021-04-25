@@ -88,6 +88,10 @@ int main()
             }
           }
         }
+        else 
+        {
+          while ((wait(&status)) > 0);  
+        }
       }
     }
   } 
@@ -132,7 +136,7 @@ int main()
           { 
             if(!(strstr(ep->d_name, ".txt")) && strstr(ep->d_name, ".jpg"))
             {
-              for(i = 0; i < it; i++)
+              for(i = 0; i < it + 1; i++)
               {
                 char str[200], curr[20];
                 if ((age[i+1]-(int)age[i+1]) > 0.0)

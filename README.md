@@ -221,19 +221,84 @@ void del(){
 }
 ```
 
+**Proses Daemon**
+```
+ pid_t pid, sid;        // Variabel untuk menyimpan PID
+
+    pid = fork();     // Menyimpan PID dari Child Process
+
+    /* Keluar saat fork gagal
+    * (nilai variabel pid < 0) */
+    if (pid < 0) {
+        exit(EXIT_FAILURE);
+    }
+
+    /* Keluar saat fork berhasil
+    * (nilai variabel pid adalah PID dari child process) */
+    if (pid > 0) {
+        exit(EXIT_SUCCESS);
+    }
+
+    umask(0);
+
+    sid = setsid();
+    if (sid < 0) {
+        exit(EXIT_FAILURE);
+    }
+
+    if ((chdir("/home/bunga/modul-2/soal1/")) < 0) {
+        exit(EXIT_FAILURE);
+    }
+
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+```
+
 **Full Code:**
 ```
+    pid_t pid, sid;        // Variabel untuk menyimpan PID
+
+    pid = fork();     // Menyimpan PID dari Child Process
+
+    /* Keluar saat fork gagal
+    * (nilai variabel pid < 0) */
+    if (pid < 0) {
+        exit(EXIT_FAILURE);
+    }
+
+    /* Keluar saat fork berhasil
+    * (nilai variabel pid adalah PID dari child process) */
+    if (pid > 0) {
+        exit(EXIT_SUCCESS);
+    }
+
+    umask(0);
+
+    sid = setsid();
+    if (sid < 0) {
+        exit(EXIT_FAILURE);
+    }
+
+    if ((chdir("/home/bunga/modul-2/soal1/")) < 0) {
+        exit(EXIT_FAILURE);
+    }
+
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+
     int status, status2, status3, done=0, done2=0, done3=0;
     struct tm *ptr, *ptr2;
     time_t lt, lt2;
- 
+
     while(1){
         lt = time(NULL);
         ptr = localtime(&lt);
         
         // sleep(1);
         //printf("%d %d %d %d %d %d\n", ptr->tm_year, ptr->tm_mon, ptr->tm_mday, ptr->tm_hour, ptr->tm_min, ptr->tm_sec);
-        if(!done && ptr->tm_year==121 && ptr->tm_mon==3 && ptr->tm_mday==9 && ptr->tm_hour==16 && ptr->tm_min==21 && ptr->tm_sec==59)
+        if(!done && ptr->tm_year==121 && ptr->tm_mon==3 && ptr->tm_mday==9 && ptr->tm_hour==16 && ptr->tm_min==21)
         {
             done=1;
             int child_id, child_id2, child_id3, child_id4, child_id5;
@@ -254,7 +319,7 @@ void del(){
                             // sleep(10);
                         }
 
-                            printf("%s", asctime(ptr));
+                            // printf("%s", asctime(ptr));
                             
                                 child_id4 = fork();
                                 if(child_id4==0){
@@ -263,7 +328,7 @@ void del(){
                                     child_id5 = fork();
                                     if(child_id5==0){
                                         sleep(15);
-                                        while ((wait(&status2)) > 0);
+                                        while ((wait(&status)) > 0);
                                         del();
                                     }
                                     else{
@@ -273,6 +338,9 @@ void del(){
                                 else{
                                     move();
                                 }
+                            //}
+                           
+                       // }
                     }
                     else{
                         unzip();
@@ -429,7 +497,7 @@ void getAnimal()
   {
     int i;
     getAnimal();
-    for(i = 0; i < it; i++)
+    for(i = 0; i < it + 1; i++)
     {
       if(fork() == 0)
       {
